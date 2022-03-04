@@ -15,6 +15,11 @@ any user can book a seat for any of these criteria<br>
 if there is an available seat, taking into consideration if the bus is full from Cairo to
 AlMinya, the user cannot book any seat from AlFayyum but he can book from AlMinya.</h4>
 
+## ERD
+
+<img src="https://github.com/Dina-Essam/Bus-Booking-System/tree/master/database/ERD.png?raw=true"/>
+
+
 ## To run locally, do the usual:
 
 1- Install the dependencies<br>
