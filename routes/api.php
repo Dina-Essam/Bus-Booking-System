@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\TripController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\JWTAuthController;
 
@@ -16,6 +17,7 @@ use App\Http\Controllers\API\JWTAuthController;
 
 Route::post('register', [JWTAuthController::class, 'register']);
 Route::post('login', [JWTAuthController::class, 'login']);
+Route::post('trips/available', [TripController::class, 'availableTrips']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
 

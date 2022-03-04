@@ -29,24 +29,54 @@ class Trip extends Model
         return $this->hasMany(Booking::class,'trip_id');
     }
 
-    public function hasAvailableSeats(Station $source , Station $destination):Boolean
+    public function hasAvailableSeats(Station $source , Station $destination)
     {
         return count($this->getSeatsReserved($source,$destination))<12;
     }
 
     public function getSeatsReserved(Station $source , Station $destination)
     {
-        return $this->bookings->where(
+        //Check that 2 stations from the trip
+        $source = $this->stations()->where('id','=',$source->id)->firstOrFail();
+        $destination= $this->stations()->where('id','=',$destination->id)
+            ->where('order','>',$source->order)->firstOrFail();
+
+        return $this->whereHas('bookings',
             function ($query) use ($source,$destination){
-                $query->source_station()->where('order','>=',$source->order)
-                    ->where('order','<=',$destination->order);
+                $query->whereHas('source_station' ,function ($query2) use ($source,$destination){
+                    $query2->where('order','>=',$source->order)
+                        ->where('order','<=',$destination->order);
+                });
             }
-        )->orWhere(
+        )->orWhereHas('bookings',
             function ($query) use ($source,$destination){
-                $query->destination_station()->where('order','>=',$source->order)
-                    ->where('order','<=',$destination->order);
+                $query->whereHas('destination_station',function ($query2) use ($source,$destination){
+                    $query2->where('order','>=',$source->order)
+                        ->where('order','<=',$destination->order);
+                });
             }
-        )->seatsMapping->seat()->get();
+        )->get()->pluck('bookings')->flatten()->pluck('seatsMapping')->flatten()->pluck('seat')->flatten();
+    }
+
+    public static function getAvailableTrips(City $source , City $destination)
+    {
+        $trips = Trip::whereHas('stations',
+            function ($query) use ($source){
+                $query->where('city_id','=',$source->id);
+            }
+        )->whereHas('stations',
+            function ($query) use ($destination){
+                $query->where('city_id','=',$destination->id);
+            }
+        )->get();
+        foreach ($trips as $index => $trip)
+        {
+            $sourceStation = $trip->stations->where('city_id','=',$source->id)->first();
+            $destinationStation = $trip->stations->where('city_id','=',$destination->id)->first();
+            if($destinationStation->order <= $sourceStation->order || !$trip->hasAvailableSeats($sourceStation,$destinationStation))
+                $trips->forget($index);
+        }
+        return $trips;
     }
 
     public function getAvailableSeats(Station $source , Station $destination)

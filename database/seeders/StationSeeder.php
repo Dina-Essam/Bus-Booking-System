@@ -62,7 +62,7 @@ class StationSeeder extends Seeder
             ],[
                 'order'=>4,
                 'price'=>100.0,
-                'city_id'=>9,
+                'city_id'=>4,
                 'trip_id'=>2
             ]
         ];
