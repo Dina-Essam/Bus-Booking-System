@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserLoginRequest;
+use App\Http\Requests\UserStoreRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,12 +17,8 @@ use function PHPUnit\Framework\returnArgument;
 class JWTAuthController extends Controller
 {
 
-    public function register(Request $request): JsonResponse {
-        $fields = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
-        ]);
+    public function register(UserStoreRequest $request): JsonResponse {
+        $fields = $request->validated();
 
         $user = User::create([
             'name' => $fields['name'],
@@ -38,13 +36,9 @@ class JWTAuthController extends Controller
         return $this->successResponse($response);
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(UserLoginRequest $request): JsonResponse
     {
-        $fields = $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string'
-        ]);
-
+        $fields = $request->validated();
 
         if (!Auth::attempt($fields)) {
             return $this->errorResponse(ResponseAlias::HTTP_UNAUTHORIZED,'Invalid Email or Password');
