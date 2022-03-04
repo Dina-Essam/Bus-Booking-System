@@ -15,7 +15,7 @@ any user can book a seat for any of these criteria<br>
 if there is an available seat, taking into consideration if the bus is full from Cairo to
 AlMinya, the user cannot book any seat from AlFayyum but he can book from AlMinya.</h4>
 
-##To run locally, do the usual:
+## To run locally, do the usual:
 
 1- Install the dependencies<br>
 npm install
@@ -27,7 +27,7 @@ mysql>CREATE DATABASE bus_booking_system;
 3- Update MySql configuration<br>
 update in file .env
 
-5- Run Migration and seeders<br>
+4- Run Migration and seeders<br>
 php artisan migrate:refresh --seed
 
 5- Start the flask server<br>
