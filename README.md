@@ -17,7 +17,7 @@ AlMinya, the user cannot book any seat from AlFayyum but he can book from AlMiny
 
 ## ERD
 
-<img src="https://github.com/Dina-Essam/Bus-Booking-System/tree/master/database/ERD.png?raw=true"/>
+<img src="https://github.com/Dina-Essam/Bus-Booking-System/blob/master/database/ERD.png?raw=true"/>
 
 
 ## To run locally, do the usual:
