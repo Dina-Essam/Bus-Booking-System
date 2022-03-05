@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 use phpDocumentor\Reflection\Types\Boolean;
 use phpDocumentor\Reflection\Types\This;
 
@@ -85,6 +86,33 @@ class Trip extends Model
         $allSeats = $this->bus->seats()->get();
         $available_seats = $allSeats->diff($reserved);
         return $available_seats->all();
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function checkStations(Station $source , Station $destination)
+    {
+        if($destination->order <= $source->order || !$this->hasAvailableSeats($source,$destination))
+            throw ValidationException::withMessages(['source_station_id' => 'This value is incorrect',
+                'destination_station_id' => 'This value is incorrect']);
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function checkSeats(Station $source , Station $destination , $seats)
+    {
+        $availableSeats = $this->getAvailableSeats($source, $destination);
+        $all = collect($availableSeats)->pluck('id')->toArray();
+        if (array_diff($seats, $all))
+            throw ValidationException::withMessages(['seats' => 'This value is incorrect']);
+    }
+
+    public function pricePerSeat(Station $source , Station $destination)
+    {
+        return $this->stations()->where('order','>',$source->order)
+            ->where('order','<=',$destination->order)->get()->pluck('price')->sum();
     }
 
 

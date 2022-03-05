@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\TripController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\JWTAuthController;
@@ -22,5 +23,5 @@ Route::post('trips/available', [TripController::class, 'availableTrips']);
 Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('logout', [JWTAuthController::class, 'logout']);
-
+    Route::post('reservation', [BookingController::class, 'createReservation']);
 });

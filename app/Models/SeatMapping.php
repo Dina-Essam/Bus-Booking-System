@@ -10,6 +10,8 @@ class SeatMapping extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'seat_mapping';
+    protected $fillable = ['seat_id','booking_id'];
+
 
     public function seat()
     {

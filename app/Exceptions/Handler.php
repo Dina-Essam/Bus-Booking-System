@@ -6,7 +6,6 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 use App\Traits\ApiResponser;
-use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -49,11 +48,15 @@ class Handler extends ExceptionHandler
         });
     }
 
+    public function report(Throwable $exception) {
+        parent::report($exception);
+    }
+
     /**
      * Render an exception into an HTTP response.
      *
      */
-    public function render($request, Exception|Throwable $e): JsonResponse
+    public function render($request, Throwable $e): JsonResponse
     {
         $response = $this->handleException($request, $e);
         return $response;
@@ -63,8 +66,12 @@ class Handler extends ExceptionHandler
     /**
      * @throws Throwable
      */
-    public function handleException($request, Exception|Throwable $exception): JsonResponse
+    public function handleException($request, Throwable $exception): JsonResponse
     {
+        if ($exception instanceof ValidationException)
+        {
+            return $this->errorResponse(422,'Input is invalid',$exception->errors());
+        }
 
         if ($exception instanceof MethodNotAllowedHttpException) {
             return $this->errorResponse(405,'The specified method for the request is invalid');
@@ -73,6 +80,11 @@ class Handler extends ExceptionHandler
         if ($exception instanceof NotFoundHttpException) {
             return $this->errorResponse(404,'The specified URL cannot be found');
         }
+
+        if ($exception instanceof ModelNotFoundException) {
+            $exception = new NotFoundHttpException($exception->getMessage(), $exception);
+        }
+
 
         if ($exception instanceof HttpException) {
             return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
